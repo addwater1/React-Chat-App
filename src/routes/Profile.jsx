@@ -2,18 +2,7 @@
 function Profile() {
   return (
     <>
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          
-        </tbody>
-      </table>
+      <h1>Hello</h1>
     </>
   )
 }

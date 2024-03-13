@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
 import axios from "axios"
 import { add } from "../components/MessageContainer"
@@ -10,6 +10,7 @@ function Signup() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [finalPwd, setFinalPwd] = useState('')
+  const navigate = useNavigate()
 
   function changeCode() {
     axios.get(
@@ -25,32 +26,56 @@ function Signup() {
   }
 
   function signupHandler() {
-    
+    if(isValid() === false) {
+      add('Form is invalid')
+      return 
+    }
+    axios.post(
+      `${import.meta.env.VITE_API_URL}/register`,
+      {
+        username: username,
+        password: finalPwd,
+        role: "user"
+      })
+      .then(res => {
+        add(res.data)
+        navigate('/profile')
+      })
+      .catch(error => {
+        add(error.message)
+      })
+  }
+
+  function isValid() {
+    if(password !== finalPwd || password === '' || username === '' || finalPwd === '') {
+      return false
+    }
+    return true
   }
 
   return (
     <>
       <table>
         <caption>
-          <h1>Sign up</h1>
+          <h2>Sign up</h2>
         </caption>
         <tbody>
           <tr>
             <td>Username</td>
             <td>
-              <input type="text" name="" id="" onChange={e => setUsername(e.target.value)}/>
+              <input type="text" onChange={e => setUsername(e.target.value)}/>
             </td>
           </tr>
           <tr>
             <td>Password</td>
             <td>
-              <input type="text" name="" id="" onChange={e => setPassword(e.target.value)}/>
+              <input type="text" onChange={e => setPassword(e.target.value)}/>
             </td>
           </tr>
           <tr>
             <td>Confirm Password</td>
             <td>
-              <input type="text" name="" id="" onChange={e => setFinalPwd(e.target.value)}/>
+              <input type="text" onChange={e => setFinalPwd(e.target.value)}/>
             </td>
           </tr>
           <tr>
@@ -66,7 +91,7 @@ function Signup() {
           </tr>
           <tr>
             <td colSpan={2}>
-              <button disabled onClick={signupHandler}>Signup</button>
+              <button onClick={signupHandler}>Signup</button>
               <Link to="/">Login now</Link>
             </td>
           </tr>

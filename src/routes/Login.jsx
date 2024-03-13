@@ -20,7 +20,7 @@ function Login() {
         navigate('/profile')
       })
       .catch((error) => {
-        add(error.message)
+        add(error.response.data)
       })
   }
 
@@ -28,7 +28,7 @@ function Login() {
     <>
       <table>
         <caption>
-          <h1>Login to Chat Room</h1>
+          <h2>Welcome to Chat Room</h2>
         </caption>
         <tbody>
           <tr>

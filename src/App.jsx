@@ -3,6 +3,9 @@ import Login from './routes/Login'
 import Signup from './routes/Signup'
 import Profile from './routes/Profile'
 import MessageContainer from './components/MessageContainer'
+import RequireAuth from './routes/RequireAuth'
+import MainContainer from './components/MainContainer'
+
 import {
   createBrowserRouter,
   RouterProvider
@@ -19,7 +22,11 @@ const router = createBrowserRouter([
   },
   {
     path: "profile",
-    element: <Profile />
+    element: <RequireAuth children={<Profile />} isAuth={true} />,
+  },
+  {
+    path: "chat",
+    element: <MainContainer />
   }
 ])
 
