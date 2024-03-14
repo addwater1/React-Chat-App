@@ -1,12 +1,21 @@
 
-function ConversationList({changeUsername}) {
-  
+function ConversationList({changeSendTo}) {
   return (
     <>
       <div className="conversation-list">
         <div>
-          <input type="text" onChange={changeUsername} />
-          <button>Search</button>
+          <table>
+            <tbody>
+              <tr>
+                <td>
+                  Send To
+                </td>
+                <td>
+                  <input type="text" onChange={(e) => {changeSendTo(e.target.value)}} />
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </>

@@ -58,6 +58,8 @@
   margin: 10px 10px 0 10px;
   border-radius: 10px 0 10px 10px;
   padding: 5px;
+  max-width: 300px;
+  word-wrap: break-word;
 }
 
 .notice {
@@ -67,6 +69,9 @@
 .chat-title {
   height: 10%;
   border-bottom: 1px solid;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .msg-input {
@@ -74,6 +79,7 @@
   border-top: 1px solid;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .conversation-container {

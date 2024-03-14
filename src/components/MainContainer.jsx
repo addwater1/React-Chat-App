@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import ChatContainer from "./ChatContainer"
 import ConversationList from "./ConversationList"
 import { Client } from "@stomp/stompjs"
+import { UserContext } from "./Contexts"
 
-const username = "wpj"
 const stompConfig = {
   connectHeaders: {},
   brokerURL: "ws://localhost:8080/websocket",
@@ -16,14 +16,16 @@ const stompConfig = {
 function MainContainer() {
   var [index, setIndex] = useState(0)
   const [message, setMessage] = useState('')
-  const [send2User, setSend2User] = useState('')
+  const [sendTo, setSendTo] = useState('')
   var [messageGroup, setMessageGroup] = useState([])
   const [stompClient, setStompClient] = useState(() => new Client(stompConfig))
+  const {user, setUser} = useContext(UserContext)
 
   useEffect(() => {
     stompClient.onConnect = (frame) => {
-      console.log(frame)
+      console.log(frame.body)
       stompClient.subscribe("/topic/greetings", onMessage)
+      stompClient.subscribe(`/user/${user}/queue`, onMessage)
     }
     stompClient.activate()
   }, [stompClient])
@@ -32,14 +34,28 @@ function MainContainer() {
     setMessage(e.target.value)
   }
 
-  function changeUsername(e) {
-    setSend2User(e.target.value)
+  function changeUsername(m) {
+    setMessage(m)
   }
 
-  function sendMessage() {
+  function changeSendTo(m) {
+    setSendTo(m)
+  }
+
+  function sendToAll() {
     stompClient.publish({
       destination: "/app/hello",
       body: message
+    })
+  }
+
+  function sendToUser() {
+    stompClient.publish({
+      destination: "/app/specific",
+      body: JSON.stringify({
+        'username': sendTo,
+        'message': message
+      })
     })
   }
 
@@ -51,32 +67,18 @@ function MainContainer() {
     }]
     setMessageGroup(messageGroup)
     setIndex(index)
-    console.log(messageGroup)
-  }
-
-  function disconnect() {
-    stompClient.deactivate()
-  }
-
-  function connect() {
-    stompClient.activate()
-  }
-
-  function subscribe() {
-    stompClient.subscribe("/topic/greetings", messageHandler)
   }
 
   return (
     <>
       <div className="main-container">
         <ConversationList 
+          changeSendTo={changeSendTo}
           changeUsername={changeUsername}/>
         <ChatContainer
-          sendMessage={sendMessage}
+          sendToAll={sendToAll}
+          sendToUser={sendToUser}
           changeMessage={changeMessage}
-          disconnect={disconnect}
-          connect={connect}
-          subscribe={subscribe}
           messageGroup={messageGroup}/>
       </div>
     </>

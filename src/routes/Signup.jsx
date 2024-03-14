@@ -39,7 +39,7 @@ function Signup() {
       })
       .then(res => {
         add(res.data)
-        navigate('/profile')
+        navigate('/login')
       })
       .catch(error => {
         add(error.message)

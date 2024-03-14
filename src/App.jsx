@@ -5,11 +5,13 @@ import Profile from './routes/Profile'
 import MessageContainer from './components/MessageContainer'
 import RequireAuth from './routes/RequireAuth'
 import MainContainer from './components/MainContainer'
+import { UserContext } from './components/Contexts'
 
 import {
   createBrowserRouter,
   RouterProvider
 } from "react-router-dom"
+import { useState } from 'react'
 
 const router = createBrowserRouter([
   {
@@ -22,19 +24,27 @@ const router = createBrowserRouter([
   },
   {
     path: "profile",
-    element: <RequireAuth children={<Profile />} isAuth={true} />,
+    element: <RequireAuth children={<Profile />} />,
   },
   {
     path: "chat",
-    element: <MainContainer />
+    element: <RequireAuth children={<MainContainer />} />
   }
 ])
 
 function App() {
+  const [user, setUser] = useState({
+    username: "",
+    token: "",
+    captcha_uuid: ""
+  })
+
   return (
     <>
-      <MessageContainer />
-      <RouterProvider router={router} />
+      <UserContext.Provider value={{user, setUser}}>
+        <MessageContainer />
+        <RouterProvider router={router} />
+      </UserContext.Provider>
     </>
   )
 }

@@ -1,12 +1,14 @@
 import { Link, useNavigate } from "react-router-dom"
 import { add } from "../components/MessageContainer"
-import { useState } from "react"
+import { useContext, useState } from "react"
 import axios from "axios"
+import { UserContext } from "../components/Contexts"
 
 function Login() {
   const [username, setUsername] = useState()
   const [password, setPassword] = useState()
   const navigate = useNavigate()
+  const {user, setUser} = useContext(UserContext)
 
   function loginTo() {
     axios.post(
@@ -16,8 +18,13 @@ function Login() {
         password: password
       })
       .then((res) => {
-        add(res.data)
-        navigate('/profile')
+        add(`Welcome ${res.data.username}`)
+        setUser({
+          ...user,
+          username: res.data.username,
+          token: res.data.token
+        })
+        navigate('/chat')
       })
       .catch((error) => {
         add(error.response.data)
