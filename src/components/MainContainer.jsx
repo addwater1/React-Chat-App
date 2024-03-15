@@ -25,7 +25,7 @@ function MainContainer() {
     stompClient.onConnect = (frame) => {
       console.log(frame.body)
       stompClient.subscribe("/topic/greetings", onMessage)
-      stompClient.subscribe(`/user/${user}/queue`, onMessage)
+      stompClient.subscribe(`/user/${user.username}/queue`, onMessage)
     }
     stompClient.activate()
   }, [stompClient])

@@ -34,9 +34,10 @@ const router = createBrowserRouter([
 
 function App() {
   const [user, setUser] = useState({
-    username: "",
-    token: "",
-    captcha_uuid: ""
+    username: null,
+    token: null,
+    captchaId: null,
+    isAuth: false
   })
 
   return (

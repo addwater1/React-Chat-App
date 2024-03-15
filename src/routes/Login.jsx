@@ -22,7 +22,8 @@ function Login() {
         setUser({
           ...user,
           username: res.data.username,
-          token: res.data.token
+          token: res.data.token,
+          isAuth: true
         })
         navigate('/chat')
       })

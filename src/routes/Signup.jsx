@@ -1,28 +1,53 @@
 import { Link, useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import axios from "axios"
 import { add } from "../components/MessageContainer"
+import { UserContext } from "../components/Contexts"
 
 const imgUrl = `${import.meta.env.VITE_API_URL}/captcha`
 
 function Signup() {
-  const [img, setImg] = useState(imgUrl)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [finalPwd, setFinalPwd] = useState('')
+  const [captcha, setCaptcha] = useState('')
   const navigate = useNavigate()
+  const {user, setUser} = useContext(UserContext)
+  const imgRef = useRef()
+  useEffect(() => {
+    changeCode()
+  }, [])
 
   function changeCode() {
-    axios.get(
-      imgUrl,
-      {responseType: "blob"}
-      )
-      .then(res => {
-        setImg([URL.createObjectURL(res.data)])
-      })
-      .catch((error) => {
-        add(error.message)
-      })
+    if(user.captchaId !== null) {
+      axios.get(
+        `${import.meta.env.VITE_API_URL}/captcha/${user.captchaId}`,
+        {responseType: "blob"}
+        )
+        .then(res => {
+        //   setImg([URL.createObjectURL(res.data)])
+          imgRef.current.src=URL.createObjectURL(res.data)
+        })
+    }
+    else {
+      axios.get(
+        imgUrl,
+        {responseType: "blob"}
+        )
+        .then(res => {
+        //   setImg([URL.createObjectURL(res.data)])
+          imgRef.current.src=URL.createObjectURL(res.data)
+          setUser({
+            ...user,
+            captchaId: res.headers["captcha-uuid"]
+          })
+          console.log(res.headers["captcha-uuid"])
+        })
+        .catch((error) => {
+          add(error.message)
+        })
+    }
+    
   }
 
   function signupHandler() {
@@ -35,13 +60,16 @@ function Signup() {
       {
         username: username,
         password: finalPwd,
-        role: "user"
+        role: "user",
+        captcha: captcha,
+        captchaId: user.captchaId
       })
       .then(res => {
         add(res.data)
-        navigate('/login')
+        navigate('/')
       })
       .catch(error => {
+        changeCode()
         add(error.message)
       })
   }
@@ -81,12 +109,12 @@ function Signup() {
           <tr>
             <td rowSpan={2}>Check Code</td>
             <td>
-              <img src={img} alt="" style={{width: "160px", height: "90px"}} onClick={changeCode}/>
+              <img ref={imgRef} alt="" style={{width: "160px", height: "90px"}} onClick={changeCode}/>
             </td>
           </tr>
           <tr>
             <td>
-              <input type="text" />
+              <input type="text" onChange={e => setCaptcha(e.target.value)}/>
             </td>
           </tr>
           <tr>

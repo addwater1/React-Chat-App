@@ -3,7 +3,7 @@ import { UserContext } from "../components/Contexts"
 
 function RequireAuth({children}) {
   const {user, setUser} = useContext(UserContext)
-  if(user !== "") {
+  if(user.isAuth) {
     return (
       <>{children}</>
     )
