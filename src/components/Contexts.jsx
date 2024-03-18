@@ -2,4 +2,6 @@ import { createContext } from "react";
 
 const UserContext = createContext()
 
-export { UserContext }
+const OnlineUserContext = createContext()
+
+export { UserContext, OnlineUserContext }
