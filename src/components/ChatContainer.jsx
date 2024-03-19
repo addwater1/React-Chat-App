@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react"
+import { useContext, useEffect, useRef } from "react"
+import { FocusUserContext } from "./Contexts"
 
 function ChatContainer({sendToAll, sendToUser, changeMessage, messageGroup}) {
   const chatRef = useRef()
@@ -8,6 +9,8 @@ function ChatContainer({sendToAll, sendToUser, changeMessage, messageGroup}) {
       behavior: 'smooth'
     })
   }, [messageGroup])
+  const [focusUser, setFocusUser] = useContext(FocusUserContext)
+
   return (
     <>
       <div className="chat-container">
@@ -18,9 +21,9 @@ function ChatContainer({sendToAll, sendToUser, changeMessage, messageGroup}) {
           ))}
         </div>
         <div className="msg-input">
-          <textarea style={{width: "60%", height: "70%"}} onChange={changeMessage}></textarea>
-          <button style={{height: "70%"}} onClick={sendToAll}>Send To All</button>
-          <button style={{height: "70%"}} onClick={sendToUser}>Send To User</button>
+          <textarea style={{width: "80%", height: "70%"}} onChange={changeMessage}></textarea>
+          {/* <button style={{height: "70%"}} onClick={sendToAll}>Send To All</button> */}
+          <button style={{height: "78%"}} onClick={() => {sendToUser(focusUser)}}>Send</button>
         </div>
       </div>
     </>

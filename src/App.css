@@ -17,17 +17,17 @@
   padding: 5px;
 }
 
-.main-container {
-  width: 80%;
+/* .main-container {
+  width: 100%;
   height: 100%;
-}
+} */
 
 .conversation-list {
   border: 1px solid;
   position: absolute;
-  left: 10%;
+  left: 25%;
   top: 10%;
-  width: 20%;
+  width: 10%;
   height: 80%;
   overflow: hidden;
 }
@@ -35,9 +35,9 @@
 .chat-container {
   border: 1px solid;
   position: absolute;
-  right: 10%;
+  right: 25%;
   top: 10%;
-  width: calc(60% - 3px);
+  width: calc(40% - 3px);
   height: 80%;
   overflow: hidden;
   display: flex;

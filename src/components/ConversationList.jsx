@@ -1,21 +1,21 @@
+import { useContext, useState } from "react"
+import { FocusUserContext, OnlineUserContext } from "./Contexts"
 
-function ConversationList({changeSendTo}) {
+function ConversationList() {
+  const [onlineUser, setOnlineUser] = useContext(OnlineUserContext)
+  const [focusUser, setFocusUser] = useContext(FocusUserContext)  
+
   return (
     <>
       <div className="conversation-list">
         <div>
-          <table>
-            <tbody>
-              <tr>
-                <td>
-                  Send To
-                </td>
-                <td>
-                  <input type="text" onChange={(e) => {changeSendTo(e.target.value)}} />
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          {onlineUser.map(i => (
+            <div key={i.key}>
+              {i.value === focusUser ? 
+                i.value : 
+                <button onClick={() => {setFocusUser(i.value)}}>{i.value}</button>}
+            </div>
+          ))}
         </div>
       </div>
     </>

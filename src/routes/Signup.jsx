@@ -41,7 +41,7 @@ function Signup() {
             ...user,
             captchaId: res.headers["captcha-uuid"]
           })
-          console.log(res.headers["captcha-uuid"])
+        //   console.log(res.headers["captcha-uuid"])
         })
         .catch((error) => {
           add(error.message)

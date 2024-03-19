@@ -2,14 +2,14 @@ import { useContext, useEffect, useState } from "react"
 import ChatContainer from "./ChatContainer"
 import ConversationList from "./ConversationList"
 import { Client } from "@stomp/stompjs"
-import { OnlineUserContext, UserContext } from "./Contexts"
+import { FocusUserContext, OnlineUserContext, UserContext } from "./Contexts"
 import axios from "axios"
 
 function MainContainer() {
   var [index, setIndex] = useState(0)
   const [message, setMessage] = useState('')
-  const [sendTo, setSendTo] = useState('')
   const [onlineUser, setOnlineUser] = useState([])
+  const [focusUser, setFocusUser] = useState()
   var [messageGroup, setMessageGroup] = useState([])
   const {user, setUser} = useContext(UserContext)
 
@@ -41,12 +41,6 @@ function MainContainer() {
   const [stompClient, setStompClient] = useState(() => new Client(stompConfig))
 
   useEffect(() => {
-    // stompClient.onConnect = (frame) => {
-    //   console.log(frame.body)
-    //   stompClient.subscribe("/topic/greetings", onMessage)
-    //   stompClient.subscribe(`/user/${user.username}/queue`, onMessage)
-    // }
-
     stompClient.activate()
     
     return () => {
@@ -58,14 +52,6 @@ function MainContainer() {
     setMessage(e.target.value)
   }
 
-  function changeUsername(m) {
-    setMessage(m)
-  }
-
-  function changeSendTo(m) {
-    setSendTo(m)
-  }
-
   function sendToAll() {
     stompClient.publish({
       destination: "/app/hello",
@@ -73,11 +59,11 @@ function MainContainer() {
     })
   }
 
-  function sendToUser() {
+  function sendToUser(username) {
     stompClient.publish({
       destination: "/app/specific",
       body: JSON.stringify({
-        'username': sendTo,
+        'username': username,
         'message': message
       })
     })
@@ -94,24 +80,23 @@ function MainContainer() {
   }
 
   function onSynchronize(frame) {
-    let userList = JSON.parse(frame.body)
-    setOnlineUser(userList)
-    console.log(userList)
+    setOnlineUser(JSON.parse(frame.body))
+    console.log(JSON.parse(frame.body))
   }
 
   return (
     <>
       <OnlineUserContext.Provider value={[onlineUser, setOnlineUser]}>
-        <div className="main-container">
-          <ConversationList 
-            changeSendTo={changeSendTo}
-            changeUsername={changeUsername}/>
-          <ChatContainer
-            sendToAll={sendToAll}
-            sendToUser={sendToUser}
-            changeMessage={changeMessage}
-            messageGroup={messageGroup}/>
-        </div>
+        <FocusUserContext.Provider value={[focusUser, setFocusUser]}>
+          <div className="main-container">
+            <ConversationList />
+            <ChatContainer
+              sendToAll={sendToAll}
+              sendToUser={sendToUser}
+              changeMessage={changeMessage}
+              messageGroup={messageGroup}/>
+          </div>
+        </FocusUserContext.Provider>
       </OnlineUserContext.Provider>
     </>
   )

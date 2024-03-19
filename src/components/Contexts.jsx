@@ -4,4 +4,6 @@ const UserContext = createContext()
 
 const OnlineUserContext = createContext()
 
-export { UserContext, OnlineUserContext }
+const FocusUserContext = createContext()
+
+export { UserContext, OnlineUserContext, FocusUserContext }
