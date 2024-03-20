@@ -2,16 +2,17 @@ import { useContext, useEffect, useState } from "react"
 import ChatContainer from "./ChatContainer"
 import ConversationList from "./ConversationList"
 import { Client } from "@stomp/stompjs"
-import { FocusUserContext, OnlineUserContext, UserContext } from "./Contexts"
+import { FocusUserContext, MessageContext, MessageGroupContext, OnlineUserContext, UserContext } from "./Contexts"
 import axios from "axios"
+import localforage from "localforage"
 
 function MainContainer() {
-  var [index, setIndex] = useState(0)
-  const [message, setMessage] = useState('')
   const [onlineUser, setOnlineUser] = useState([])
-  const [focusUser, setFocusUser] = useState()
-  var [messageGroup, setMessageGroup] = useState([])
+  const [focusUser, setFocusUser] = useState("")
+  const [message, setMessage] = useState("")
+  const [messageGroup, setMessageGroup] = useState([])
   const {user, setUser} = useContext(UserContext)
+  const [receive, setReceive] = useState("")
 
   const stompConfig = {
     connectHeaders: {
@@ -30,7 +31,7 @@ function MainContainer() {
 
       axios.get("http://localhost:8080/user/online")
       .then(res => {
-        console.log(res.data)
+        // console.log(res.data)
         setOnlineUser(res.data)
       })
       .catch(err => {
@@ -48,54 +49,103 @@ function MainContainer() {
     }
   }, [stompClient])
 
-  function changeMessage(e) {
-    setMessage(e.target.value)
-  }
+//   useEffect(() => {
+//     if (focusUser === "") {
+//       return
+//     }
+//     localforage.setItem(focusUser, messageGroup)
+//     .then(() => {
+//       console.log("success store")
+//     })
+//     .catch(() => {
+//       console.log("failed store")
+//     })
+//   }, [messageGroup])
+
+  useEffect(() => {
+    if(receive !== ""){
+      if(receive.from === focusUser) {
+        localforage.getItem(receive.from)
+          .then(value => {
+            value = value === null ? [] : value;
+            localforage.setItem(receive.from, [...value, receive])
+            setMessageGroup(messageGroup => [...messageGroup, receive])
+          })
+      }
+      else {
+        localforage.getItem(receive.from)
+          .then(value => {
+            value = value === null ? [] : value;
+            localforage.setItem(receive.from, [...value, receive])
+          })
+      }
+    }
+  }, [receive])
+
+  useEffect(() => {
+    localforage.config({
+      storeName: user.username
+    })
+  }, [])
 
   function sendToAll() {
     stompClient.publish({
       destination: "/app/hello",
-      body: message
+      body: focusUser
     })
   }
 
-  function sendToUser(username) {
+  function sendToUser() {
     stompClient.publish({
       destination: "/app/specific",
       body: JSON.stringify({
-        'username': username,
+        'from': user.username,
+        'to': focusUser,
         'message': message
       })
     })
   }
 
   function onMessage(frame) {
-    index = index + 1
-    messageGroup = [...messageGroup, {
-      id: index,
-      message: frame.body
-    }]
-    setMessageGroup(messageGroup)
-    setIndex(index)
+    // const tmp = JSON.parse(frame.body)
+    setReceive(JSON.parse(frame.body))
+    console.log(JSON.parse(frame.body))
+    // setMessageGroup(messageGroup => [...messageGroup, tmp])
+
+    // if(tmp.from === focusUser) {
+    //   setMessageGroup(messageGroup => [...messageGroup, tmp])
+    // }
+    // localforage.getItem(tmp.from)
+    //   .then(value => {
+    //     value = value === null ? [] : value;
+    //     localforage.setItem(tmp.from, [...value, tmp])
+    //   })
+
+    // localforage.setItem(tmp.from, tmp)
+    // setMessageGroup([...messageGroup, frame.body])
+    // console.log(messageGroup)
+    // console.log(tmp)
   }
 
   function onSynchronize(frame) {
     setOnlineUser(JSON.parse(frame.body))
-    console.log(JSON.parse(frame.body))
+    // console.log(JSON.parse(frame.body))
   }
 
   return (
     <>
       <OnlineUserContext.Provider value={[onlineUser, setOnlineUser]}>
         <FocusUserContext.Provider value={[focusUser, setFocusUser]}>
-          <div className="main-container">
-            <ConversationList />
-            <ChatContainer
-              sendToAll={sendToAll}
-              sendToUser={sendToUser}
-              changeMessage={changeMessage}
-              messageGroup={messageGroup}/>
-          </div>
+          <MessageGroupContext.Provider value={[messageGroup, setMessageGroup]}>
+            <MessageContext.Provider value={[message, setMessage]}>
+              <div className="main-container">
+                <ConversationList />
+                <ChatContainer
+                  sendToAll={sendToAll}
+                  sendToUser={sendToUser}/>
+              </div>
+            </MessageContext.Provider>
+          </MessageGroupContext.Provider>
         </FocusUserContext.Provider>
       </OnlineUserContext.Provider>
     </>

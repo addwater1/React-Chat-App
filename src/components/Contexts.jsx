@@ -6,4 +6,8 @@ const OnlineUserContext = createContext()
 
 const FocusUserContext = createContext()
 
-export { UserContext, OnlineUserContext, FocusUserContext }
+const MessageGroupContext = createContext()
+
+const MessageContext = createContext()
+
+export { UserContext, OnlineUserContext, FocusUserContext, MessageContext, MessageGroupContext }
