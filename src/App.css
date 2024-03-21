@@ -44,7 +44,7 @@
   flex-direction: column;
 }
 
-.recived-msg {
+.received-msg {
   align-self: start;
   border: 1px solid;
   margin: 10px 10px 0 10px;

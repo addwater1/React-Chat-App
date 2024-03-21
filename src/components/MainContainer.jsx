@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import ChatContainer from "./ChatContainer"
 import ConversationList from "./ConversationList"
 import { Client } from "@stomp/stompjs"
@@ -12,7 +12,7 @@ function MainContainer() {
   const [message, setMessage] = useState("")
   const [messageGroup, setMessageGroup] = useState([])
   const {user, setUser} = useContext(UserContext)
-  const [receive, setReceive] = useState("")
+  const [receive, setReceive] = useState(null)
 
   const stompConfig = {
     connectHeaders: {
@@ -49,37 +49,21 @@ function MainContainer() {
     }
   }, [stompClient])
 
-//   useEffect(() => {
-//     if (focusUser === "") {
-//       return
-//     }
-//     localforage.setItem(focusUser, messageGroup)
-//     .then(() => {
-//       console.log("success store")
-//     })
-//     .catch(() => {
-//       console.log("failed store")
-//     })
-//   }, [messageGroup])
-
   useEffect(() => {
-    if(receive !== ""){
-      if(receive.from === focusUser) {
-        localforage.getItem(receive.from)
-          .then(value => {
-            value = value === null ? [] : value;
-            localforage.setItem(receive.from, [...value, receive])
-            setMessageGroup(messageGroup => [...messageGroup, receive])
-          })
-      }
-      else {
-        localforage.getItem(receive.from)
-          .then(value => {
-            value = value === null ? [] : value;
-            localforage.setItem(receive.from, [...value, receive])
-          })
-      }
-    }
+    if(receive === null)
+      return
+    
+    localforage.getItem(receive.from)
+      .then(value => {
+        value = value === null ? [] : value;
+        localforage.setItem(receive.from, [...value, receive])
+        if(receive.from === focusUser) {
+          setMessageGroup(messageGroup => [...messageGroup, receive])
+        }
+      })
+      .catch(error => {
+        console.error(error)
+      })
   }, [receive])
 
   useEffect(() => {
@@ -96,36 +80,41 @@ function MainContainer() {
   }
 
   function sendToUser() {
+    if(!stompClient.connected)
+      return
+    const stompBody = {
+      'from': user.username,
+      'to': focusUser,
+      'message': message
+    }
     stompClient.publish({
       destination: "/app/specific",
-      body: JSON.stringify({
-        'from': user.username,
-        'to': focusUser,
-        'message': message
-      })
+      body: JSON.stringify(stompBody)
     })
+    localforage.setItem(focusUser, [...messageGroup, stompBody])
+    setMessageGroup(messageGroup => [...messageGroup, stompBody])
   }
 
   function onMessage(frame) {
     // const tmp = JSON.parse(frame.body)
     setReceive(JSON.parse(frame.body))
-    console.log(JSON.parse(frame.body))
     // setMessageGroup(messageGroup => [...messageGroup, tmp])
-
-    // if(tmp.from === focusUser) {
-    //   setMessageGroup(messageGroup => [...messageGroup, tmp])
-    // }
-    // localforage.getItem(tmp.from)
-    //   .then(value => {
-    //     value = value === null ? [] : value;
-    //     localforage.setItem(tmp.from, [...value, tmp])
-    //   })
-
-    // localforage.setItem(tmp.from, tmp)
-    // setMessageGroup([...messageGroup, frame.body])
-    // console.log(messageGroup)
-    // console.log(tmp)
   }
+
+//   const onMessage = useCallback((frame) => {
+//     const copy = JSON.parse(frame.body)
+//     if(focusUser === copy.from) {
+//       setMessageGroup(messageGroup => [...messageGroup, copy])
+//     }
+//     localforage.getItem(copy.from)
+//       .then(value => {
+//         value = value === null ? [] : value;
+//         localforage.setItem(copy.from, [...value, copy])
+//       })
+//       .catch(err => {
+//         console.log(err)
+//       })
+//   }, [focusUser])
 
   function onSynchronize(frame) {
     setOnlineUser(JSON.parse(frame.body))

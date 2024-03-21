@@ -4,7 +4,7 @@ import { FocusUserContext, MessageContext, MessageGroupContext } from "./Context
 function ChatContainer({sendToAll, sendToUser}) {
   const chatRef = useRef()
   const [messageGroup, setMessageGroup] = useContext(MessageGroupContext)
-//   const [focusUser, setFocusUser] = useContext(FocusUserContext)
+  const [focusUser, setFocusUser] = useContext(FocusUserContext)
   const [message, setMessage] = useContext(MessageContext)
 
   useEffect(() => {
@@ -20,7 +20,7 @@ function ChatContainer({sendToAll, sendToUser}) {
         <div className="chat-title">Chat Room</div>
         <div className="conversation-container" ref={chatRef}>
           {messageGroup.map((i, index) => (
-            <div className="sent-msg" key={index}>{i.message}</div>
+            <div className={i.from === focusUser ? "received-msg" : "sent-msg"} key={index}>{i.message}</div>
           ))}
         </div>
         <div className="msg-input">
