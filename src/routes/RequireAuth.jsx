@@ -1,9 +1,9 @@
 import { useContext } from "react"
-import { UserContext } from "../components/Contexts"
+import { ChatState, UserContext } from "../components/Contexts"
 
 function RequireAuth({children}) {
-  const {user, setUser} = useContext(UserContext)
-  if(user.isAuth) {
+  const {userInfo} = ChatState()
+  if(userInfo.isAuth) {
     return (
       <>{children}</>
     )

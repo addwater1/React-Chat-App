@@ -91,34 +91,18 @@ function MainContainer() {
       destination: "/app/specific",
       body: JSON.stringify(stompBody)
     })
+    if(user.username === focusUser)
+      return
     localforage.setItem(focusUser, [...messageGroup, stompBody])
     setMessageGroup(messageGroup => [...messageGroup, stompBody])
   }
 
   function onMessage(frame) {
-    // const tmp = JSON.parse(frame.body)
     setReceive(JSON.parse(frame.body))
-    // setMessageGroup(messageGroup => [...messageGroup, tmp])
   }
-
-//   const onMessage = useCallback((frame) => {
-//     const copy = JSON.parse(frame.body)
-//     if(focusUser === copy.from) {
-//       setMessageGroup(messageGroup => [...messageGroup, copy])
-//     }
-//     localforage.getItem(copy.from)
-//       .then(value => {
-//         value = value === null ? [] : value;
-//         localforage.setItem(copy.from, [...value, copy])
-//       })
-//       .catch(err => {
-//         console.log(err)
-//       })
-//   }, [focusUser])
 
   function onSynchronize(frame) {
     setOnlineUser(JSON.parse(frame.body))
-    // console.log(JSON.parse(frame.body))
   }
 
   return (

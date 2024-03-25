@@ -1,14 +1,29 @@
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { add } from "../components/MessageContainer"
 import { useContext, useState } from "react"
 import axios from "axios"
-import { UserContext } from "../components/Contexts"
+import { ChatState, UserContext } from "../components/Contexts"
+import Signup from "./Signup"
+import { 
+  Button, 
+  Container, 
+  FormControl, 
+  FormLabel, 
+  GridItem, 
+  Heading, 
+  Input, 
+  SimpleGrid, 
+  Tab, 
+  Tabs,
+  TabList,
+  TabPanels,
+  TabPanel} from "@chakra-ui/react"
 
 function Login() {
   const [username, setUsername] = useState()
   const [password, setPassword] = useState()
   const navigate = useNavigate()
-  const {user, setUser} = useContext(UserContext)
+  const {userInfo, setUserInfo} = ChatState()
 
   function loginTo() {
     axios.post(
@@ -18,9 +33,9 @@ function Login() {
         password: password
       })
       .then((res) => {
-        add(`Welcome ${res.data.username}`)
-        setUser({
-          ...user,
+        console.log(`Welcome ${res.data.username}`)
+        setUserInfo({
+          ...userInfo,
           username: res.data.username,
           token: res.data.token,
           isAuth: true
@@ -28,39 +43,62 @@ function Login() {
         navigate('/chat')
       })
       .catch((error) => {
-        add(error.response.data)
+        console.log(error)
       })
   }
 
   return (
     <>
-      <table>
-        <caption>
-          <h2>Welcome to Chat Room</h2>
-        </caption>
-        <tbody>
-          <tr>
-            <td>Username</td>
-            <td>
-              <input id="username" type="text" onChange={e => setUsername(e.target.value)}/>
-            </td>
-          </tr>
-          <tr>
-            <td>Password</td>
-            <td>
-              <input id="password" type="text" onChange={e => setPassword(e.target.value)}/>
-            </td>
-          </tr>
-          <tr>
-            <td colSpan={2}>
-              <button onClick={loginTo}>Login</button>
-              <Link to="/signup">Signup now</Link>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <SimpleGrid spacing={6}>
+        <GridItem>
+          <FormControl>
+            <FormLabel>Username</FormLabel>
+            <Input onChange={e => setUsername(e.target.value)}/>
+          </FormControl>
+        </GridItem>
+        <GridItem>
+          <FormControl>
+            <FormLabel>Password</FormLabel>
+            <Input type="password" onChange={e => setPassword(e.target.value)}/>
+          </FormControl>
+        </GridItem>
+        <GridItem>
+          <Button w={"full"} onClick={loginTo}>Login</Button>
+        </GridItem>
+      </SimpleGrid>
     </>
   )
 }
 
-export default Login
+function LoginContainer() {
+  return (<>
+    <Container>
+      <SimpleGrid spacing={7}>
+        <GridItem>
+          <Heading>
+            Welcome
+          </Heading>
+        </GridItem>
+        <GridItem>
+          <Tabs isFitted>
+            <TabList>
+              <Tab>Login</Tab>
+              <Tab>Signup</Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel>
+                <Login/>
+              </TabPanel>
+              <TabPanel>
+                <Signup/>
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        </GridItem>
+        
+      </SimpleGrid>
+    </Container>
+  </>)
+}
+
+export default LoginContainer

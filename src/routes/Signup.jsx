@@ -2,7 +2,17 @@ import { Link, useNavigate } from "react-router-dom"
 import { useContext, useEffect, useRef, useState } from "react"
 import axios from "axios"
 import { add } from "../components/MessageContainer"
-import { UserContext } from "../components/Contexts"
+import { ChatState, UserContext } from "../components/Contexts"
+import { 
+  Button,
+  FormControl,
+  FormLabel,
+  GridItem, 
+  Input, 
+  SimpleGrid,
+  Image, 
+  Center
+} from "@chakra-ui/react"
 
 const imgUrl = `${import.meta.env.VITE_API_URL}/captcha`
 
@@ -12,16 +22,17 @@ function Signup() {
   const [finalPwd, setFinalPwd] = useState('')
   const [captcha, setCaptcha] = useState('')
   const navigate = useNavigate()
-  const {user, setUser} = useContext(UserContext)
+  const {userInfo, setUserInfo} = ChatState()
   const imgRef = useRef()
+
   useEffect(() => {
     changeCode()
   }, [])
 
   function changeCode() {
-    if(user.captchaId !== null) {
+    if(userInfo.captchaId !== null) {
       axios.get(
-        `${import.meta.env.VITE_API_URL}/captcha/${user.captchaId}`,
+        `${import.meta.env.VITE_API_URL}/captcha/${userInfo.captchaId}`,
         {responseType: "blob"}
         )
         .then(res => {
@@ -37,14 +48,14 @@ function Signup() {
         .then(res => {
         //   setImg([URL.createObjectURL(res.data)])
           imgRef.current.src=URL.createObjectURL(res.data)
-          setUser({
-            ...user,
+          setUserInfo({
+            ...userInfo,
             captchaId: res.headers["captcha-uuid"]
           })
         //   console.log(res.headers["captcha-uuid"])
         })
         .catch((error) => {
-          add(error.message)
+          console.log(error)
         })
     }
     
@@ -52,7 +63,7 @@ function Signup() {
 
   function signupHandler() {
     if(isValid() === false) {
-      add('Form is invalid')
+      console.log('Form is invalid')
       return 
     }
     axios.post(
@@ -62,15 +73,15 @@ function Signup() {
         password: finalPwd,
         role: "user",
         captcha: captcha,
-        captchaId: user.captchaId
+        captchaId: userInfo.captchaId
       })
       .then(res => {
-        add(res.data)
+        console.log(res.data)
         navigate('/')
       })
       .catch(error => {
         changeCode()
-        add(error.message)
+        console.log(error.message)
       })
   }
 
@@ -83,48 +94,42 @@ function Signup() {
 
   return (
     <>
-      <table>
-        <caption>
-          <h2>Sign up</h2>
-        </caption>
-        <tbody>
-          <tr>
-            <td>Username</td>
-            <td>
-              <input type="text" onChange={e => setUsername(e.target.value)}/>
-            </td>
-          </tr>
-          <tr>
-            <td>Password</td>
-            <td>
-              <input type="text" onChange={e => setPassword(e.target.value)}/>
-            </td>
-          </tr>
-          <tr>
-            <td>Confirm Password</td>
-            <td>
-              <input type="text" onChange={e => setFinalPwd(e.target.value)}/>
-            </td>
-          </tr>
-          <tr>
-            <td rowSpan={2}>Check Code</td>
-            <td>
-              <img ref={imgRef} alt="" style={{width: "160px", height: "90px"}} onClick={changeCode}/>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <input type="text" onChange={e => setCaptcha(e.target.value)}/>
-            </td>
-          </tr>
-          <tr>
-            <td colSpan={2}>
-              <button onClick={signupHandler}>Signup</button>
-              <Link to="/">Login now</Link>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <SimpleGrid rowGap={6}>
+        <GridItem>
+          <FormControl>
+            <FormLabel>Username</FormLabel>
+            <Input onChange={e => setUsername(e.target.value)}/>
+          </FormControl>
+        </GridItem>
+        <GridItem>
+          <FormControl>
+            <FormLabel>Password</FormLabel>
+            <Input type="password" onChange={e => setPassword(e.target.value)}/>
+          </FormControl>
+        </GridItem>
+        <GridItem>
+          <FormControl>
+            <FormLabel>Confirm Password</FormLabel>
+            <Input type="password" onChange={e => setFinalPwd(e.target.value)}/>
+          </FormControl>
+        </GridItem>
+        <SimpleGrid columns={2}>
+          <GridItem>
+            <Center>
+              <Image ref={imgRef} onClick={changeCode}/>
+            </Center>
+          </GridItem>
+          <GridItem>
+            <FormControl>
+              <FormLabel>Type the characters</FormLabel>
+              <Input onChange={e => setCaptcha(e.target.value)}/>
+            </FormControl>
+          </GridItem>
+        </SimpleGrid>
+        <GridItem>
+          <Button w={"full"} onClick={signupHandler}>Signup</Button>
+        </GridItem>
+      </SimpleGrid>
     </>
   )
 }
