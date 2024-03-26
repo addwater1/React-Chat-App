@@ -1,8 +1,7 @@
 import { useNavigate } from "react-router-dom"
-import { add } from "../components/MessageContainer"
-import { useContext, useState } from "react"
+import { useState } from "react"
 import axios from "axios"
-import { ChatState, UserContext } from "../components/Contexts"
+import { ChatState } from "../components/Contexts"
 import Signup from "./Signup"
 import { 
   Button, 
@@ -17,13 +16,16 @@ import {
   Tabs,
   TabList,
   TabPanels,
-  TabPanel} from "@chakra-ui/react"
+  TabPanel,
+  Center,
+  useToast} from "@chakra-ui/react"
 
 function Login() {
   const [username, setUsername] = useState()
   const [password, setPassword] = useState()
   const navigate = useNavigate()
   const {userInfo, setUserInfo} = ChatState()
+  const toast = useToast()
 
   function loginTo() {
     axios.post(
@@ -43,7 +45,14 @@ function Login() {
         navigate('/chat')
       })
       .catch((error) => {
-        console.log(error)
+        toast({
+          title: 'Failed',
+          description: error.response.data,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position:'top-right'
+        })
       })
   }
 
@@ -53,17 +62,26 @@ function Login() {
         <GridItem>
           <FormControl>
             <FormLabel>Username</FormLabel>
-            <Input onChange={e => setUsername(e.target.value)}/>
+            <Input 
+              bg={'white'}
+              onChange={e => setUsername(e.target.value)}
+            />
           </FormControl>
         </GridItem>
         <GridItem>
           <FormControl>
             <FormLabel>Password</FormLabel>
-            <Input type="password" onChange={e => setPassword(e.target.value)}/>
+            <Input 
+              type="password" 
+              bg={'white'}
+              onChange={e => setPassword(e.target.value)}/>
           </FormControl>
         </GridItem>
         <GridItem>
-          <Button w={"full"} onClick={loginTo}>Login</Button>
+          <Button 
+            w={"full"} 
+            colorScheme="teal"
+            onClick={loginTo}>Login</Button>
         </GridItem>
       </SimpleGrid>
     </>
@@ -72,12 +90,18 @@ function Login() {
 
 function LoginContainer() {
   return (<>
-    <Container>
+    <Container 
+      bg={'gray.200'}
+      mt={50}  
+      pb={10}
+    >
       <SimpleGrid spacing={7}>
         <GridItem>
-          <Heading>
-            Welcome
-          </Heading>
+          <Center>
+            <Heading mt={10}>
+              Welcome
+            </Heading>
+          </Center>
         </GridItem>
         <GridItem>
           <Tabs isFitted>

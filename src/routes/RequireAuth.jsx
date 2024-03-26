@@ -1,17 +1,15 @@
-import { useContext } from "react"
-import { ChatState, UserContext } from "../components/Contexts"
+import { ChatState } from "../components/Contexts"
+import ErrorPage from "../components/ErrorPage"
 
 function RequireAuth({children}) {
   const {userInfo} = ChatState()
   if(userInfo.isAuth) {
     return (
-      <>{children}</>
+      children
     )
   } else {
     return (
-      <>
-        <h1>Error</h1>
-      </>
+      <ErrorPage />
     )
   }
 }

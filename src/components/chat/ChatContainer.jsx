@@ -4,14 +4,16 @@ import {
   VStack,
   Text, 
   Button,
-  Input
-} from "@chakra-ui/react"
+  Input,
+} from "@chakra-ui/react";
 import { ChatState } from "../Contexts";
 import { useRef, useEffect } from "react";
+import { useStomp } from "../stomp/StompHook";
+import localforage from "localforage";
 
 function Message({value}) {
   const {userInfo} = ChatState()
-  return (<>
+  return (
     <Box
       p={3}
       mx={3}
@@ -21,18 +23,42 @@ function Message({value}) {
     >
       <Text>{value.message}</Text>
     </Box>
-  </>)
+  )
 }
 
-export default function ChatContainer({sendToUser}) {
-  const {focusUser, message, setMessage, messageGroup} = ChatState();
+export default function ChatContainer() {
+  const {focusUser, message, setMessage, messageGroup, setMessageGroup, userInfo} = ChatState();
+  const {isConnected, send} = useStomp();
   const chatRef = useRef();
+
   useEffect(() => {
     chatRef.current.scrollTo({
       top: chatRef.current.scrollHeight,
       behavior: 'instant'
     })
   }, [messageGroup])
+
+  useEffect(() => {
+    localforage.config({
+      storeName: userInfo.username
+    })
+  }, [])
+
+  function sendToUser() {
+    setMessage("");
+    if(!isConnected)
+      return
+    const stompBody = {
+      'from': userInfo.username,
+      'to': focusUser,
+      'message': message
+    }
+    send(stompBody, "/app/specific")
+    if(userInfo.username === focusUser)
+      return
+    localforage.setItem(focusUser, [...messageGroup, stompBody])
+    setMessageGroup(messageGroup => [...messageGroup, stompBody])
+  }
 
   return (<>
     <Box 
@@ -81,11 +107,8 @@ export default function ChatContainer({sendToUser}) {
         />
         <Button 
           mr={2} 
-          bg={'white'}
-          onClick={() => {
-            sendToUser();
-            setMessage("");
-          }}
+          onClick={sendToUser}
+          colorScheme="teal"
         >
           Send
         </Button>

@@ -1,8 +1,7 @@
-import { Link, useNavigate } from "react-router-dom"
-import { useContext, useEffect, useRef, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { useEffect, useRef, useState } from "react"
 import axios from "axios"
-import { add } from "../components/MessageContainer"
-import { ChatState, UserContext } from "../components/Contexts"
+import { ChatState } from "../components/Contexts"
 import { 
   Button,
   FormControl,
@@ -11,7 +10,8 @@ import {
   Input, 
   SimpleGrid,
   Image, 
-  Center
+  Center,
+  useToast
 } from "@chakra-ui/react"
 
 const imgUrl = `${import.meta.env.VITE_API_URL}/captcha`
@@ -24,6 +24,7 @@ function Signup() {
   const navigate = useNavigate()
   const {userInfo, setUserInfo} = ChatState()
   const imgRef = useRef()
+  const toast = useToast()
 
   useEffect(() => {
     changeCode()
@@ -64,6 +65,14 @@ function Signup() {
   function signupHandler() {
     if(isValid() === false) {
       console.log('Form is invalid')
+      toast({
+        title: 'Failed',
+        description: 'Form is invalid',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position:'top-right'
+      })
       return 
     }
     axios.post(
@@ -77,11 +86,18 @@ function Signup() {
       })
       .then(res => {
         console.log(res.data)
-        navigate('/')
+        navigate('/success')
       })
       .catch(error => {
         changeCode()
-        console.log(error.message)
+        toast({
+          title: 'Failed',
+          description: error.response.data,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position:'top-right'
+        })
       })
   }
 
@@ -98,19 +114,27 @@ function Signup() {
         <GridItem>
           <FormControl>
             <FormLabel>Username</FormLabel>
-            <Input onChange={e => setUsername(e.target.value)}/>
+            <Input 
+              bg={'white'}
+              onChange={e => setUsername(e.target.value)}/>
           </FormControl>
         </GridItem>
         <GridItem>
           <FormControl>
             <FormLabel>Password</FormLabel>
-            <Input type="password" onChange={e => setPassword(e.target.value)}/>
+            <Input 
+              bg={'white'}
+              type="password" 
+              onChange={e => setPassword(e.target.value)}/>
           </FormControl>
         </GridItem>
         <GridItem>
           <FormControl>
             <FormLabel>Confirm Password</FormLabel>
-            <Input type="password" onChange={e => setFinalPwd(e.target.value)}/>
+            <Input 
+              type="password" 
+              bg={'white'}
+              onChange={e => setFinalPwd(e.target.value)}/>
           </FormControl>
         </GridItem>
         <SimpleGrid columns={2}>
@@ -122,12 +146,17 @@ function Signup() {
           <GridItem>
             <FormControl>
               <FormLabel>Type the characters</FormLabel>
-              <Input onChange={e => setCaptcha(e.target.value)}/>
+              <Input 
+                bg={'white'}
+                onChange={e => setCaptcha(e.target.value)}/>
             </FormControl>
           </GridItem>
         </SimpleGrid>
         <GridItem>
-          <Button w={"full"} onClick={signupHandler}>Signup</Button>
+          <Button 
+            w={"full"} 
+            colorScheme="teal"
+            onClick={signupHandler}>Signup</Button>
         </GridItem>
       </SimpleGrid>
     </>

@@ -1,17 +1,5 @@
 import { createContext, useContext, useState } from "react";
 
-const UserContext = createContext()
-
-const OnlineUserContext = createContext()
-
-const FocusUserContext = createContext()
-
-const MessageGroupContext = createContext()
-
-const MessageContext = createContext()
-
-export { UserContext, OnlineUserContext, FocusUserContext, MessageContext, MessageGroupContext }
-
 //rewrite context provider
 const ChatContext = createContext();
 
