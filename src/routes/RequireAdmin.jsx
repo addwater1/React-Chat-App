@@ -3,7 +3,7 @@ import ErrorPage from "../components/ErrorPage"
 
 function RequireAuth({children}) {
   const {userInfo} = ChatState()
-  if(userInfo.isAuth) {
+  if(userInfo.role === "ADMIN") {
     return (
       children
     )

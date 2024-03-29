@@ -14,13 +14,19 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { ChatState } from "../Contexts";
 
 function Record({ value, setFlag }) {
   const [update, setUpdate] = useState(false)
   const [role, setRole] = useState(value.role)
+  const {userInfo} = ChatState()
   function deleteUser(username) {
     axios.get(
-      `http://localhost:8080/user/delete/${username}`
+      `http://localhost:8080/user/delete/${username}`,{
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`
+        }
+      }
     )
       .then(res => {
         console.log(res.data)
@@ -33,7 +39,13 @@ function Record({ value, setFlag }) {
       {
         username: value.username,
         role: role
-      }
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`
+        },
+      },
+      
     )
       .then(res => {
         console.log(res.data)
@@ -62,7 +74,7 @@ function Record({ value, setFlag }) {
             <option value={'ADMIN'} >ADMIN</option>
           </Select>
           : 
-          role
+          value.role
         }
       </Td>
       
@@ -97,11 +109,16 @@ export default function UserManagement() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [role, setRole] = useState('USER')
-  const [userList, setUserList] = useState(null)
+  const [userList, setUserList] = useState([])
   const [flag, setFlag] = useState(false)
+  const {userInfo} = ChatState()
   function getUserList() {
     axios.get(
-      'http://localhost:8080/user/all'
+      'http://localhost:8080/user/all',{
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`
+        }
+      }
     )
       .then(res => {
         console.log(res.data)
@@ -115,7 +132,13 @@ export default function UserManagement() {
         username: username,
         password: password,
         role: role
-      }
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`
+        },
+      },
+      
     )
       .then(res => {
         console.log(res.data)

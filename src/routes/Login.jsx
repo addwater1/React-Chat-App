@@ -43,7 +43,7 @@ function Login() {
           isAuth: true,
           role: res.data.role
         })
-        navigate('/management')
+        navigate('/chat')
       })
       .catch((error) => {
         toast({

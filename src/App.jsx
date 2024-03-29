@@ -1,6 +1,5 @@
 import Login from './routes/Login'
 import Signup from './routes/Signup'
-import Profile from './routes/Profile'
 import RequireAuth from './routes/RequireAuth'
 import Test from './components/UserManagement/UserManagement'
 import ChatContextProvider from './components/Contexts'
@@ -25,12 +24,8 @@ const router = createBrowserRouter([
     element: <Signup />
   },
   {
-    path: "profile",
-    element: <RequireAuth children={<Profile />} />,
-  },
-  {
     path: "chat",
-    element: <RequireAuth children={<StompContainer />} role={"USER"} />
+    element: <RequireAuth children={<StompContainer />}/>
   },
   {
     path: "success",
@@ -38,7 +33,7 @@ const router = createBrowserRouter([
   },
   {
     path: "management",
-    element: <RequireAuth children={<UserManagement />} role={"ADMIN"} />
+    element: <RequireAuth children={<UserManagement />}/>
   },
   {
     path: "test",

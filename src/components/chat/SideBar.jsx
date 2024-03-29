@@ -2,6 +2,7 @@ import {
   Avatar, 
   Flex, 
 } from "@chakra-ui/react"
+import { Link } from "react-router-dom"
 
 export default function SideBar() {
   return (
@@ -11,6 +12,7 @@ export default function SideBar() {
       h={'full'}
     >
       <Avatar size={'lg'} bg='teal.500'/>
+      <Link to={"/management"} >Management</Link>
     </Flex>
   )
 }
