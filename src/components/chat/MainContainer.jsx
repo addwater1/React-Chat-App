@@ -1,5 +1,5 @@
 import { 
-    Container,
+  Container,
   Grid, 
   GridItem } from "@chakra-ui/react";
 
@@ -39,7 +39,11 @@ export default function MainContainer() {
       subscribe(`/user/${userInfo.username}/queue`, onMessage);
       subscribe("/topic/connect", onSynchronize)
       subscribe("/topic/greetings", onMessage)
-      axios.get("http://localhost:8080/user/online")
+      axios.get("http://localhost:8080/user/online",{
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`
+        }
+      })
         .then(res => {
           console.log(res.data)
           setOnlineUser(res.data)
@@ -51,7 +55,7 @@ export default function MainContainer() {
     localforage.config({
       storeName: userInfo.username
     })
-  }, [isConnected])
+  }, [isConnected, userInfo])
 
   function onMessage(frame) {
     setReceive(JSON.parse(frame.body))

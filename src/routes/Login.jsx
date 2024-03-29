@@ -32,7 +32,7 @@ function Login() {
       'http://localhost:8080/login',
       {
         username: username,
-        password: password
+        password: password,
       })
       .then((res) => {
         console.log(`Welcome ${res.data.username}`)
@@ -40,13 +40,14 @@ function Login() {
           ...userInfo,
           username: res.data.username,
           token: res.data.token,
-          isAuth: true
+          isAuth: true,
+          role: res.data.role
         })
-        navigate('/chat')
+        navigate('/management')
       })
       .catch((error) => {
         toast({
-          title: 'Failed',
+          title: 'Login Failed',
           description: error.response.data,
           status: 'error',
           duration: 3000,

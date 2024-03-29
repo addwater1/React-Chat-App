@@ -2,7 +2,7 @@ import Login from './routes/Login'
 import Signup from './routes/Signup'
 import Profile from './routes/Profile'
 import RequireAuth from './routes/RequireAuth'
-import Test from './routes/Test'
+import Test from './components/UserManagement/UserManagement'
 import ChatContextProvider from './components/Contexts'
 
 import {
@@ -13,6 +13,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 import StompContainer from './components/chat/StompContainer'
 import SuccessPage from './components/SuccessPage'
 import ErrorPage from './components/ErrorPage'
+import UserManagement from './components/UserManagement/UserManagement'
 
 const router = createBrowserRouter([
   {
@@ -29,16 +30,19 @@ const router = createBrowserRouter([
   },
   {
     path: "chat",
-    element: <RequireAuth children={<StompContainer />} />
+    element: <RequireAuth children={<StompContainer />} role={"USER"} />
   },
   {
     path: "success",
     element: <SuccessPage />
   },
   {
+    path: "management",
+    element: <RequireAuth children={<UserManagement />} role={"ADMIN"} />
+  },
+  {
     path: "test",
-    // element: <Test />
-    element: <ErrorPage />
+    element: <Test />
     // element: <StompContainer />
   }
 ])

@@ -66,7 +66,7 @@ function Signup() {
     if(isValid() === false) {
       console.log('Form is invalid')
       toast({
-        title: 'Failed',
+        title: 'Signup Failed',
         description: 'Form is invalid',
         status: 'error',
         duration: 3000,
@@ -91,7 +91,7 @@ function Signup() {
       .catch(error => {
         changeCode()
         toast({
-          title: 'Failed',
+          title: 'Signup Failed',
           description: error.response.data,
           status: 'error',
           duration: 3000,

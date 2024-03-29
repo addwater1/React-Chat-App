@@ -1,13 +1,14 @@
 import { ChatState } from "../components/Contexts"
 import ErrorPage from "../components/ErrorPage"
 
-function RequireAuth({children}) {
+function RequireAuth({children, role}) {
   const {userInfo} = ChatState()
-  if(userInfo.isAuth) {
+  if(userInfo.role === role) {
     return (
       children
     )
-  } else {
+  }
+  else {
     return (
       <ErrorPage />
     )

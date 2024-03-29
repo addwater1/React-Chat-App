@@ -9,7 +9,8 @@ export default function ChatContextProvider({children}) {
     username: null,
     token: null,
     captchaId: null,
-    isAuth: false
+    isAuth: false,
+    role: null
   });
   const [onlineUser, setOnlineUser] = useState([]);
   const [focusUser, setFocusUser] = useState("");
