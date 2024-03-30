@@ -1,60 +1,87 @@
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
-import axios from "axios"
 import { ChatState } from "../components/Contexts"
 import Signup from "./Signup"
-import { 
-  Button, 
-  Container, 
-  FormControl, 
-  FormLabel, 
-  GridItem, 
-  Heading, 
-  Input, 
-  SimpleGrid, 
-  Tab, 
+import { loginRequest } from "../api/user"
+import {
+  Button,
+  Container,
+  FormControl,
+  FormLabel,
+  GridItem,
+  Heading,
+  Input,
+  SimpleGrid,
+  Tab,
   Tabs,
   TabList,
   TabPanels,
   TabPanel,
   Center,
-  useToast} from "@chakra-ui/react"
+  useToast
+} from "@chakra-ui/react"
 
 function Login() {
   const [username, setUsername] = useState()
   const [password, setPassword] = useState()
   const navigate = useNavigate()
-  const {userInfo, setUserInfo} = ChatState()
+  const { userInfo, setUserInfo } = ChatState()
   const toast = useToast()
 
-  function loginTo() {
-    axios.post(
-      'http://localhost:8080/login',
-      {
-        username: username,
-        password: password,
+  async function login() {
+    const loginData = {
+      username: username,
+      password: password
+    }
+    try {
+      const result = await loginRequest(loginData)
+      setUserInfo({
+        ...userInfo,
+        username: result.data.username,
+        token: result.data.token,
+        isAuth: true,
+        role: result.data.role
       })
-      .then((res) => {
-        console.log(`Welcome ${res.data.username}`)
-        setUserInfo({
-          ...userInfo,
-          username: res.data.username,
-          token: res.data.token,
-          isAuth: true,
-          role: res.data.role
-        })
-        navigate('/chat')
+      navigate('/chat')
+    }
+    catch (e) {
+      console.log(e)
+      toast({
+        title: 'Login Failed',
+        description: e.response.data,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right'
       })
-      .catch((error) => {
-        toast({
-          title: 'Login Failed',
-          description: error.response.data,
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-          position:'top-right'
-        })
-      })
+    }
+    // axios.post(
+    //   'http://localhost:8080/login',
+    //   {
+    //     username: username,
+    //     password: password,
+    //   })
+    //   .then((res) => {
+    //     console.log(`Welcome ${res.data.username}`)
+    //     setUserInfo({
+    //       ...userInfo,
+    //       username: res.data.username,
+    //       token: res.data.token,
+    //       isAuth: true,
+    //       role: res.data.role
+    //     })
+    //     navigate('/chat')
+    //   })
+    //   .catch((error) => {
+    //     toast({
+    //       title: 'Login Failed',
+    //       description: error.response.data,
+    //       status: 'error',
+    //       duration: 3000,
+    //       isClosable: true,
+    //       position:'top-right'
+    //     })
+    //   })
   }
 
   return (
@@ -63,7 +90,7 @@ function Login() {
         <GridItem>
           <FormControl>
             <FormLabel>Username</FormLabel>
-            <Input 
+            <Input
               bg={'white'}
               onChange={e => setUsername(e.target.value)}
             />
@@ -72,17 +99,17 @@ function Login() {
         <GridItem>
           <FormControl>
             <FormLabel>Password</FormLabel>
-            <Input 
-              type="password" 
+            <Input
+              type="password"
               bg={'white'}
-              onChange={e => setPassword(e.target.value)}/>
+              onChange={e => setPassword(e.target.value)} />
           </FormControl>
         </GridItem>
         <GridItem>
-          <Button 
-            w={"full"} 
+          <Button
+            w={"full"}
             colorScheme="teal"
-            onClick={loginTo}>Login</Button>
+            onClick={login}>Login</Button>
         </GridItem>
       </SimpleGrid>
     </>
@@ -91,9 +118,9 @@ function Login() {
 
 function LoginContainer() {
   return (<>
-    <Container 
+    <Container
       bg={'gray.200'}
-      mt={50}  
+      mt={50}
       pb={10}
     >
       <SimpleGrid spacing={7}>
@@ -112,15 +139,15 @@ function LoginContainer() {
             </TabList>
             <TabPanels>
               <TabPanel>
-                <Login/>
+                <Login />
               </TabPanel>
               <TabPanel>
-                <Signup/>
+                <Signup />
               </TabPanel>
             </TabPanels>
           </Tabs>
         </GridItem>
-        
+
       </SimpleGrid>
     </Container>
   </>)
